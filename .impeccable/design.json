@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-26T12:16:28.074413+00:00",
+  "generatedAt": "2026-10-26T15:27:23.510429+00:00",
   "title": "Design System: طلاقة / TALAQA",
   "extensions": {
     "shadows": [
@@ -62,7 +62,37 @@
         "name": "phone",
         "value": "540px"
       }
-    ]
+    ],
+    "colorMeta": {
+      "dark-paper": {
+        "displayName": "Dark paper",
+        "role": "neutral"
+      },
+      "dark-surface": {
+        "displayName": "Dark working surface",
+        "role": "neutral"
+      },
+      "dark-ink": {
+        "displayName": "Dark primary text",
+        "role": "neutral"
+      },
+      "dark-line": {
+        "displayName": "Dark divider",
+        "role": "neutral"
+      },
+      "dark-secondary-ink": {
+        "displayName": "Dark supporting text",
+        "role": "neutral"
+      },
+      "dark-tonal": {
+        "displayName": "Dark selected surface",
+        "role": "neutral"
+      },
+      "dark-marker": {
+        "displayName": "Dark learning marker",
+        "role": "neutral"
+      }
+    }
   },
   "components": [
     {
@@ -122,18 +152,24 @@
   ],
   "narrative": {
     "northStar": "A quiet learning desk",
-    "overview": "A welcoming, calm workspace makes daily practice feel manageable. Forest green anchors the interface; ivory, white and mint give Arabic text room to breathe. Peach and lavender markers help learners scan activities. The visual system supports practice, explanations and actual progress, with honest service states. Visual review approved shipping as an MVP within the original material-fix scope: legibility, mobile statistics, AI availability, touch areas, and remaining surface/completion evidence are resolved, along with the mobile browser voice/privacy disclosure. Live AI provider readiness and production launch remain unvalidated.",
+    "overview": "A welcoming, calm workspace makes daily practice feel manageable. Forest green anchors the interface; ivory, white and mint give Arabic text room to breathe. Peach and lavender markers help learners scan activities. The visual system supports practice, explanations and actual progress, with honest service states. Visual review approved shipping as an MVP within the original material-fix scope: legibility, mobile statistics, AI availability, touch areas, and remaining surface/completion evidence are resolved, along with the mobile browser voice/privacy disclosure. Live AI provider readiness and production launch remain unvalidated. User preferences now explicitly include Arabic/English switching, dark mode and expanded learning. Version 2 review disposition: ship within the reviewed MVP scope. Review inspected all 12 screenshots and additionally verified all 12 lesson navigation and the closed drawer’s inert/aria-hidden behavior in Chromium at 390px in both languages. No material fixes were required. Live AI and actual microphone/audio quality were outside this review scope. Dark mode retains the forest identity through deep paper, tonal surfaces and light ink. LTR mirrors the navigation shell and uses DM Sans. The curriculum and speaking workshop follow the established bordered surface system.",
     "keyCharacteristics": [
       "Arabic first with deliberate English regions",
       "Tonal surfaces and fine borders",
       "Clear daily actions and readable explanations",
-      "Honest learner data and capability states"
+      "Honest learner data and capability states",
+      "Arabic/English direction support",
+      "Explicit light and dark appearance",
+      "Structured lesson reading and local speaking self-review"
     ],
     "rules": [],
     "dos": [
       "Do preserve RTL and explicit English LTR regions.",
       "Do use final readable-copy overrides and wrapping mobile statistics.",
-      "Do retain focus visibility and reduced motion."
+      "Do retain focus visibility and reduced motion.",
+      "Do mirror the navigation and drawer for English LTR.",
+      "Do apply dark surface and state colors consistently.",
+      "Do disclose browser-local completion and recordings, silent videos and self-review limitations."
     ],
     "donts": [
       "Don't imply browser speech is a live AI session.",

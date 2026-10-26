@@ -96,11 +96,18 @@ test("AI integration forwards tutor policy and returns provider response", async
         messages: [
           { role: "user", content: "I studies every day", demo: false },
         ],
+        language:"en", level:"B1", focus:"job interview",
       }),
     });
     assert.equal(r.status, 200);
     assert.equal((await r.json()).message, "Try: I study every day.");
     assert.equal(request.messages[0].role, "system");
+    assert.match(request.messages[0].content, /Explain in English/);
+    assert.match(request.messages[0].content, /Learner level: B1/);
+    assert.match(
+      request.messages[0].content,
+      /Never claim to have heard or graded pronunciation/,
+    );
     assert.equal(request.messages[1].content, "I studies every day");
     assert.equal(request.messages[1].demo, undefined);
   } finally {

@@ -19,26 +19,23 @@ test("grammar exercise explains answers and persists actual result", async ({
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "تدريب STEP", exact: true }).click();
-  await page.getByRole("button", { name: /القواعد ابنِ/ }).click();
-  for (const [i, answer] of [
-    "studies",
-    "would learn",
-    "had started",
-    "that",
-  ].entries()) {
+  await page
+    .getByRole("button", { name: "الدروس والشروحات", exact: true })
+    .click();
+  await page.getByRole("button", { name: "اختبر فهمك", exact: true }).click();
+  for (const [i, answer] of ["drinks", "work"].entries()) {
     await page.getByRole("button", { name: new RegExp(answer + "$") }).click();
     await page.getByRole("button", { name: "تحقّق من إجابتي" }).click();
     await expect(page.getByText("إجابة صحيحة، أحسنت!")).toBeVisible();
     await page
-      .getByRole("button", { name: i === 3 ? "شوف النتيجة" : "السؤال التالي" })
+      .getByRole("button", { name: i === 1 ? "شوف النتيجة" : "السؤال التالي" })
       .click();
   }
   await page.getByRole("button", { name: "احفظ النتيجة وشوف تقدمك" }).click();
-  await expect(page.getByText("4 / 4", { exact: true })).toBeVisible();
+  await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: "تقدّمي", exact: true }).click();
-  await expect(page.getByText("4 / 4", { exact: true })).toBeVisible();
+  await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
 });
 test("teacher accurately marks unavailable AI and fixed demo", async ({
   page,
@@ -127,4 +124,64 @@ test("new learner account syncs vocabulary and survives logout/login", async ({
     }
     db.close();
   }
+});
+test("English, dark mode and lesson progress persist with a localized quiz", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+  await page.getByRole("button", { name: "Dark mode", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Lessons & explanations", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Mark complete", exact: true })
+    .click();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(
+    page.getByRole("button", { name: "Lesson completed", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Check your understanding", exact: true })
+    .click();
+  await page.getByRole("button", { name: /drinks$/ }).click();
+  await page
+    .getByRole("button", { name: "Check my answer", exact: true })
+    .click();
+  await expect(page.getByText("Correct. Well done!")).toBeVisible();
+  await expect(
+    page.getByText(/Use the present simple for habits and facts/).last(),
+  ).toBeVisible();
+});
+test("mobile English navigation and speaking recorder handle denied microphone", async ({
+  page,
+  context,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Switch to English" }).click();
+  await page
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Speaking practice", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Your voice grows with practice" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.evaluate(() => {
+    navigator.mediaDevices.getUserMedia = () =>
+      Promise.reject(new DOMException("denied", "NotAllowedError"));
+  });
+  await page.getByRole("button", { name: "Record your voice" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Allow microphone access",
+  );
 });

@@ -1,3 +1,8 @@
+import "./preferences";
+import { savePreference } from "./preferences";
+import { getLanguage } from "./i18n/core";
+import { Learning, Speaking } from "./Learning";
+import { courses, courseQuestions } from "./courses";
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -34,6 +39,9 @@ import {
   Square,
   Settings,
   LogOut,
+  Moon,
+  Sun,
+  Languages,
 } from "lucide-react";
 import "@fontsource-variable/noto-sans-arabic";
 import "@fontsource-variable/dm-sans";
@@ -41,6 +49,8 @@ import "./styles.css";
 import { questions, words } from "./content";
 const nav = [
   ["home", "رحلتي", LayoutDashboard],
+  ["lessons", "الدروس والشروحات", BookOpen],
+  ["speaking", "تدريب الكلام", Mic],
   ["teacher", "المعلم الذكي", MessageCircle],
   ["step", "تدريب STEP", ClipboardList],
   ["words", "مكتبتي", BookOpen],
@@ -83,13 +93,35 @@ function speak(text, onEnd) {
 }
 function route() {
   const hash = location.hash.slice(1);
-  return ["home", "teacher", "step", "words", "progress", "plans"].includes(
-    hash,
-  )
+  return [
+    "home",
+    "teacher",
+    "step",
+    "words",
+    "progress",
+    "plans",
+    "lessons",
+    "speaking",
+  ].includes(hash)
     ? hash
     : "home";
 }
 function App() {
+  const [language, setLanguage] = useState(document.documentElement.lang);
+  const [theme, setTheme] = useState(document.documentElement.dataset.theme);
+  const switchLanguage = () => {
+    const next = language === "ar" ? "en" : "ar";
+    document.documentElement.lang = next;
+    document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
+    savePreference("talaqa-language", next);
+    setLanguage(next);
+  };
+  const switchTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    savePreference("talaqa-theme", next);
+    setTheme(next);
+  };
   const [mobile, setMobile] = useState(
     () => matchMedia("(max-width:760px)").matches,
   );
@@ -212,7 +244,10 @@ function App() {
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
-      .then((d) => { setAi(d.aiConfigured); setEphemeralStorage(!!d.ephemeralStorage); })
+      .then((d) => {
+        setAi(d.aiConfigured);
+        setEphemeralStorage(!!d.ephemeralStorage);
+      })
       .catch(() => setAi(false));
   }, []);
   useEffect(() => {
@@ -307,7 +342,7 @@ function App() {
           >
             <span className="avatar">{data.name[0]}</span>
             <span>
-              <strong>{data.name}</strong>
+              <strong data-localize={false}>{data.name}</strong>
               <small>{user ? "حسابك متصل" : "رحلتك تبدأ بخطوة"}</small>
             </span>
             <Settings size={18} />
@@ -338,6 +373,31 @@ function App() {
             </strong>
           </div>
           <div className="top-actions">
+            <button
+              className="preference-button"
+              onClick={switchLanguage}
+              aria-label={
+                language === "ar" ? "Switch to English" : "التبديل إلى العربية"
+              }
+            >
+              <Languages size={17} />
+              <span>{language === "ar" ? "English" : "العربية"}</span>
+            </button>
+            <button
+              className="icon-button theme-toggle"
+              onClick={switchTheme}
+              aria-label={
+                language === "ar"
+                  ? theme === "dark"
+                    ? "الوضع النهاري"
+                    : "الوضع الليلي"
+                  : theme === "dark"
+                    ? "Light mode"
+                    : "Dark mode"
+              }
+            >
+              {theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
             {!user && !authLoading && (
               <button
                 className="account-button"
@@ -347,11 +407,14 @@ function App() {
               </button>
             )}
             <span className="date-label">
-              {new Date().toLocaleDateString("ar-SA", {
-                day: "numeric",
-                month: "long",
-                calendar: "gregory",
-              })}
+              {new Date().toLocaleDateString(
+                language === "ar" ? "ar-SA" : "en-US",
+                {
+                  day: "numeric",
+                  month: "long",
+                  calendar: "gregory",
+                },
+              )}
             </span>
             <button className="streak" onClick={() => go("progress")}>
               <Flame size={17} />
@@ -367,12 +430,31 @@ function App() {
           </div>
         </header>
         <div className="page-content">
-          {ephemeralStorage && <div className="notice" role="status"><ShieldCheck size={20}/><p>هذه نسخة تجريبية على استضافة مجانية. بيانات الحسابات على الخادم مؤقتة وقد تُحذف عند إعادة التشغيل؛ احتفظ بتقدمك في هذا المتصفح.</p></div>}
+          {ephemeralStorage && (
+            <div className="notice" role="status">
+              <ShieldCheck size={20} />
+              <p>
+                هذه نسخة تجريبية على استضافة مجانية. بيانات الحسابات على الخادم
+                مؤقتة وقد تُحذف عند إعادة التشغيل؛ احتفظ بتقدمك في هذا المتصفح.
+              </p>
+            </div>
+          )}
           {storageError && (
             <div className="notice error" role="alert">
               تعذّر حفظ تقدمك في هذا المتصفح. تأكد من السماح بالتخزين المحلي.
             </div>
           )}
+          {page === "lessons" && (
+            <Learning
+              startQuiz={(mode) => setModal({ type: "quiz", mode })}
+              goTeacher={(lesson) => {
+                update((d) => ({ ...d, messages: [] }));
+                savePreference("talaqa-tutor-topic", lesson.title.en);
+                go("teacher");
+              }}
+            />
+          )}
+          {page === "speaking" && <Speaking />}
           {page === "home" && (
             <>
               <div className="page-heading">
@@ -397,7 +479,8 @@ function App() {
                   <h2>
                     إنجليزيتك تتحسّن.
                     <br />
-                    وثقتك <em>تتكلم.</em>
+                    وثقتك{" "}
+                    <em>{getLanguage() === "en" ? " speaks." : "تتكلم."}</em>
                   </h2>
                   <p>
                     تكلّم، جرّب، واغلط براحتك. معلمك الذكي يساعدك
@@ -895,6 +978,14 @@ function PageHeading({ title, description }) {
   );
 }
 function Teacher({ ai, data, update, setToast }) {
+  const [tutorLevel, setTutorLevel] = useState("A2");
+  const [tutorFocus, setTutorFocus] = useState(() => {
+    try {
+      return localStorage.getItem("talaqa-tutor-topic") || "conversation";
+    } catch {
+      return "conversation";
+    }
+  });
   const [mode, setMode] = useState("text"),
     [input, setInput] = useState(""),
     [busy, setBusy] = useState(false),
@@ -938,7 +1029,12 @@ function Teacher({ ai, data, update, setToast }) {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: next.slice(-20) }),
+          body: JSON.stringify({
+            messages: next.slice(-20),
+            language: getLanguage(),
+            level: tutorLevel,
+            focus: tutorFocus,
+          }),
         });
         const body = await res.json();
         if (!res.ok)
@@ -1067,6 +1163,38 @@ function Teacher({ ai, data, update, setToast }) {
               </button>
             </div>
           )}
+          <div className="tutor-options">
+            <label>
+              {getLanguage() === "ar" ? "مستواك" : "Your level"}
+              <select
+                value={tutorLevel}
+                onChange={(e) => setTutorLevel(e.target.value)}
+              >
+                {["A1", "A2", "B1", "B2", "C1"].map((v) => (
+                  <option key={v}>{v}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {getLanguage() === "ar" ? "هدف الجلسة" : "Session focus"}
+              <select
+                value={tutorFocus}
+                onChange={(e) => setTutorFocus(e.target.value)}
+              >
+                {[
+                  "conversation",
+                  "grammar",
+                  "STEP",
+                  "job interview",
+                  ...courses.map((c) => c.title.en),
+                ].map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           <div className="chat-messages" aria-live="polite">
             {!messages.length ? (
               <div className="chat-welcome">
@@ -1102,7 +1230,9 @@ function Teacher({ ai, data, update, setToast }) {
                         ? "مثال تعليمي"
                         : "معلم طلاقة"}
                   </span>
-                  <p dir="auto">{m.content}</p>
+                  <p dir="auto" data-localize={false}>
+                    {m.content}
+                  </p>
                   {m.role === "assistant" && (
                     <button
                       className="text-button"
@@ -1223,25 +1353,33 @@ function Teacher({ ai, data, update, setToast }) {
   );
 }
 function Quiz({ mode, finish, close }) {
-  const label = {
-    full: "تدريب شامل",
-    level: "اختبار تحديد المستوى المبدئي",
-    grammar: "تدريب القواعد",
-    reading: "تدريب القراءة",
-    listening: "تدريب الاستماع",
-    vocabulary: "تدريب المفردات",
-  }[mode];
+  const allQuestions = [...questions, ...courseQuestions];
+  const course = mode.startsWith("lesson:")
+    ? courses.find((c) => c.id === mode.slice(7))
+    : null;
+  const label =
+    course?.title[getLanguage()] ||
+    {
+      full: "تدريب شامل",
+      level: "اختبار تحديد المستوى المبدئي",
+      grammar: "تدريب القواعد",
+      reading: "تدريب القراءة",
+      listening: "تدريب الاستماع",
+      vocabulary: "تدريب المفردات",
+    }[mode];
   const target = {
     grammar: "القواعد",
     reading: "القراءة",
     listening: "الاستماع",
     vocabulary: "المفردات",
   }[mode];
-  const items = target
-    ? questions.filter((q) => q.skill === target)
-    : mode === "level"
-      ? questions.slice(0, 6)
-      : questions;
+  const items = course
+    ? courseQuestions.filter((q) => q.lesson === course.id)
+    : target
+      ? allQuestions.filter((q) => q.skill === target)
+      : mode === "level"
+        ? questions.slice(0, 6)
+        : allQuestions;
   const [index, setIndex] = useState(0),
     [selected, setSelected] = useState(null),
     [revealed, setRevealed] = useState(false),
@@ -1413,7 +1551,11 @@ function Quiz({ mode, finish, close }) {
                     ? "إجابة صحيحة، أحسنت!"
                     : "نتعلم منها. الإجابة الصحيحة موضحة بالأخضر."}
                 </strong>
-                <p>{q.explanation}</p>
+                <p>
+                  {getLanguage() === "en" && q.explanationEn
+                    ? q.explanationEn
+                    : q.explanation}
+                </p>
               </div>
             )}
             <div className="quiz-actions">
@@ -1634,7 +1776,7 @@ function SettingsDialog({ data, update, user, logout, openAccount, close }) {
         </label>
         <p className="footnote">
           {user
-            ? `مسجّل بالبريد ${user.email}`
+            ? `${getLanguage() === "ar" ? "مسجّل بالبريد" : "Signed in as"} ${user.email}`
             : "تقدمك محفوظ على هذا المتصفح. أنشئ حسابًا لمتابعته من جهاز آخر."}
         </p>
         {user ? (

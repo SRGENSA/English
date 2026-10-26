@@ -292,5 +292,9 @@
   "مسار غير صالح.": "Invalid route.",
   "غير مسموح.": "Not allowed.",
   "تأخر الرد. حاول مجددًا.": "The response timed out. Try again.",
-  "حدث خطأ في الخدمة. حاول لاحقًا.": "A service error occurred. Try again later."
+  "حدث خطأ في الخدمة. حاول لاحقًا.": "A service error occurred. Try again later.",
+  "بنك الأسئلة": "Question bank",
+  "رسائل": "Messages",
+  "صوت مباشر": "Live voice",
+  "وضع الصوت يتيح اتصالًا صوتيًا مباشرًا مع المعلم عبر Realtime. يلزم الميكروفون واتصال آمن وتفعيل الخدمة لدى المزود.": "Voice mode connects directly to the AI through Realtime. A microphone, HTTPS and service activation are required."
 }

@@ -308,14 +308,7 @@ export const courses = rows.map(
     examples,
     mistake,
     quiz,
-    video: [
-      "present-simple",
-      "present-continuous",
-      "past-simple",
-      "present-perfect",
-      "articles",
-      "speaking",
-    ].includes(id),
+    video: true,
   }),
 );
 export const courseQuestions = courses.flatMap((c) =>

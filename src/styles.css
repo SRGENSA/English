@@ -3771,3 +3771,4 @@ html[dir="ltr"] .hero h2 em {
 html[data-theme="dark"] .lesson-row {
   border-bottom-color: #3e5143;
 }
+.realtime-panel{padding:40px 25px;min-height:460px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px}.realtime-symbol{height:100px;width:100px;display:grid;place-items:center;border-radius:50%;background:#e5edda;color:#416635}.realtime-symbol.active{background:#174d40;color:#e5edda}.realtime-panel h2{font-size:24px}.realtime-panel>p{max-width:55ch;line-height:2;font-size:14px}.realtime-panel .footnote{font-size:12px}.call-status{font-size:13px;color:#65725e}.realtime-panel .lesson-actions{justify-content:center;margin:0}html[data-theme=dark] .call-status{color:#b7c5ac}

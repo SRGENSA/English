@@ -1,4 +1,7 @@
 import "./preferences";
+import QuestionBank from "./QuestionBank";
+import { bankSession } from "./questionBank";
+import RealtimeVoice from "./RealtimeVoice";
 import { savePreference } from "./preferences";
 import { getLanguage } from "./i18n/core";
 import { Learning, Speaking } from "./Learning";
@@ -53,6 +56,7 @@ const nav = [
   ["speaking", "تدريب الكلام", Mic],
   ["teacher", "المعلم الذكي", MessageCircle],
   ["step", "تدريب STEP", ClipboardList],
+  ["bank", "بنك الأسئلة", ClipboardList],
   ["words", "مكتبتي", BookOpen],
   ["progress", "تقدّمي", ChartNoAxesCombined],
 ];
@@ -102,6 +106,7 @@ function route() {
     "plans",
     "lessons",
     "speaking",
+    "bank",
   ].includes(hash)
     ? hash
     : "home";
@@ -443,6 +448,9 @@ function App() {
             <div className="notice error" role="alert">
               تعذّر حفظ تقدمك في هذا المتصفح. تأكد من السماح بالتخزين المحلي.
             </div>
+          )}
+          {page === "bank" && (
+            <QuestionBank start={(mode) => setModal({ type: "quiz", mode })} />
           )}
           {page === "lessons" && (
             <Learning
@@ -1139,14 +1147,14 @@ function Teacher({ ai, data, update, setToast }) {
                   setSpeaking(false);
                 }}
               >
-                <MessageCircle size={16} /> كتابة
+                <MessageCircle size={16} /> رسائل
               </button>
               <button
                 aria-pressed={mode === "voice"}
                 className={mode === "voice" ? "selected" : ""}
                 onClick={() => setMode("voice")}
               >
-                <Mic size={16} /> صوت
+                <Mic size={16} /> صوت مباشر
               </button>
             </div>
           </div>
@@ -1195,128 +1203,108 @@ function Teacher({ ai, data, update, setToast }) {
               </select>
             </label>
           </div>
-          <div className="chat-messages" aria-live="polite">
-            {!messages.length ? (
-              <div className="chat-welcome">
-                <span className="welcome-icon">
-                  <MessageCircle size={32} />
-                </span>
-                <h3>الغلط أول خطوة للتعلّم.</h3>
-                <p>
-                  خذ راحتك، وابدأ باللي تعرفه.
-                  <br />
-                  نقدر نتمرّن على يومك، سفرك، أو اختبارك الجاي.
-                </p>
-                <div className="suggestions">
-                  {[
-                    "Let’s practice a job interview.",
-                    "اشرح لي الفرق بين since و for",
-                    "Help me introduce myself.",
-                  ].map((t) => (
-                    <button key={t} onClick={() => setInput(t)}>
-                      {t}
-                      <ArrowUpLeft size={14} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              messages.map((m, i) => (
-                <div key={i} className={`message ${m.role}`}>
-                  <span className="message-label">
-                    {m.role === "user"
-                      ? "أنت"
-                      : m.demo
-                        ? "مثال تعليمي"
-                        : "معلم طلاقة"}
-                  </span>
-                  <p dir="auto" data-localize={false}>
-                    {m.content}
-                  </p>
-                  {m.role === "assistant" && (
-                    <button
-                      className="text-button"
-                      onClick={() => speak(m.content)}
-                    >
-                      <Volume2 size={14} /> استمع
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
-            {busy && (
-              <div className="typing">
-                <LoaderCircle size={17} /> المعلم يجهّز ردّه…
-              </div>
-            )}
-            <div ref={bottom} />
-          </div>
-          {mode === "voice" && (
-            <div className="voice-controls">
-              <button
-                className={listening ? "mic-button recording" : "mic-button"}
-                aria-label={listening ? "إيقاف التسجيل" : "بدء الإملاء الصوتي"}
-                onClick={startVoice}
-              >
-                {listening ? <Square size={21} /> : <Mic size={23} />}
-              </button>
-              <span>
-                {listening
-                  ? "أسمعك… تحدث بالإنجليزية"
-                  : speaking
-                    ? "المعلم يتحدث…"
-                    : "اضغط، تكلّم، ثم راجع النص وأرسله"}
-              </span>
-              {speaking && (
-                <button
-                  className="text-button"
-                  onClick={() => {
-                    window.speechSynthesis.cancel();
-                    setSpeaking(false);
-                  }}
-                >
-                  إيقاف الصوت
-                </button>
-              )}
-              <p className="voice-disclosure">
-                إملاء وقراءة من المتصفح، وليس اتصالًا مباشرًا. قد يعالج مزوّد
-                المتصفح صوتك.
-              </p>
-            </div>
-          )}
-          {error && (
-            <div className="inline-error" role="alert">
-              {error}
-            </div>
-          )}
-          <form
-            className="chat-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              send();
-            }}
-          >
-            <input
-              aria-label="رسالتك للمعلم"
-              dir="auto"
-              placeholder="اكتب رسالتك… وبداية بسيطة تكفي"
-              value={input}
-              maxLength={3000}
-              onChange={(e) => setInput(e.target.value)}
+          {mode === "voice" ? (
+            <RealtimeVoice
+              level={tutorLevel}
+              focus={tutorFocus}
+              configured={ai === true}
             />
-            <button disabled={!input.trim() || busy} aria-label="إرسال الرسالة">
-              <Send size={20} />
-            </button>
-          </form>
-          <div className="chat-footnote">
-            قد يخطئ الذكاء الاصطناعي. لا تشارك معلوماتك الحساسة.{" "}
-            <button
-              onClick={() => update({ messages: [] })}
-              disabled={busy || !messages.length}
-            >
-              مسح المحادثة
-            </button>
-          </div>
+          ) : (
+            <>
+              <div className="chat-messages" aria-live="polite">
+                {!messages.length ? (
+                  <div className="chat-welcome">
+                    <span className="welcome-icon">
+                      <MessageCircle size={32} />
+                    </span>
+                    <h3>الغلط أول خطوة للتعلّم.</h3>
+                    <p>
+                      خذ راحتك، وابدأ باللي تعرفه.
+                      <br />
+                      نقدر نتمرّن على يومك، سفرك، أو اختبارك الجاي.
+                    </p>
+                    <div className="suggestions">
+                      {[
+                        "Let’s practice a job interview.",
+                        "اشرح لي الفرق بين since و for",
+                        "Help me introduce myself.",
+                      ].map((t) => (
+                        <button key={t} onClick={() => setInput(t)}>
+                          {t}
+                          <ArrowUpLeft size={14} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  messages.map((m, i) => (
+                    <div key={i} className={`message ${m.role}`}>
+                      <span className="message-label">
+                        {m.role === "user"
+                          ? "أنت"
+                          : m.demo
+                            ? "مثال تعليمي"
+                            : "معلم طلاقة"}
+                      </span>
+                      <p dir="auto" data-localize={false}>
+                        {m.content}
+                      </p>
+                      {m.role === "assistant" && (
+                        <button
+                          className="text-button"
+                          onClick={() => speak(m.content)}
+                        >
+                          <Volume2 size={14} /> استمع
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+                {busy && (
+                  <div className="typing">
+                    <LoaderCircle size={17} /> المعلم يجهّز ردّه…
+                  </div>
+                )}
+                <div ref={bottom} />
+              </div>
+              {error && (
+                <div className="inline-error" role="alert">
+                  {error}
+                </div>
+              )}
+              <form
+                className="chat-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  send();
+                }}
+              >
+                <input
+                  aria-label="رسالتك للمعلم"
+                  dir="auto"
+                  placeholder="اكتب رسالتك… وبداية بسيطة تكفي"
+                  value={input}
+                  maxLength={3000}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+                <button
+                  disabled={!input.trim() || busy}
+                  aria-label="إرسال الرسالة"
+                >
+                  <Send size={20} />
+                </button>
+              </form>
+              <div className="chat-footnote">
+                قد يخطئ الذكاء الاصطناعي. لا تشارك معلوماتك الحساسة.{" "}
+                <button
+                  onClick={() => update({ messages: [] })}
+                  disabled={busy || !messages.length}
+                >
+                  مسح المحادثة
+                </button>
+              </div>
+            </>
+          )}
         </section>
         <aside className="teacher-guide">
           <h3>خلّها محادثة مفيدة</h3>
@@ -1342,9 +1330,8 @@ function Teacher({ ai, data, update, setToast }) {
             <Headphones size={24} />
             <h4>صوتك، بثقة أكبر</h4>
             <p>
-              وضع الصوت يستخدم إملاء وقراءة المتصفح، وليس اتصالًا صوتيًا
-              مباشرًا. الدعم والأصوات تختلف حسب الجهاز. قد يعالج مزود المتصفح
-              الصوت لتفريغه.
+              وضع الصوت يتيح اتصالًا صوتيًا مباشرًا مع المعلم عبر Realtime. يلزم
+              الميكروفون واتصال آمن وتفعيل الخدمة لدى المزود.
             </p>
           </div>
         </aside>
@@ -1353,11 +1340,19 @@ function Teacher({ ai, data, update, setToast }) {
   );
 }
 function Quiz({ mode, finish, close }) {
+  const [bankItems] = useState(() =>
+    mode.startsWith("bank:") ? bankSession(...mode.split(":").slice(1)) : null,
+  );
   const allQuestions = [...questions, ...courseQuestions];
   const course = mode.startsWith("lesson:")
     ? courses.find((c) => c.id === mode.slice(7))
     : null;
   const label =
+    (bankItems
+      ? getLanguage() === "en"
+        ? "Generated grammar practice"
+        : "تدريب قواعد مولّد"
+      : null) ||
     course?.title[getLanguage()] ||
     {
       full: "تدريب شامل",
@@ -1373,13 +1368,15 @@ function Quiz({ mode, finish, close }) {
     listening: "الاستماع",
     vocabulary: "المفردات",
   }[mode];
-  const items = course
-    ? courseQuestions.filter((q) => q.lesson === course.id)
-    : target
-      ? allQuestions.filter((q) => q.skill === target)
-      : mode === "level"
-        ? questions.slice(0, 6)
-        : allQuestions;
+  const items =
+    bankItems ||
+    (course
+      ? courseQuestions.filter((q) => q.lesson === course.id)
+      : target
+        ? allQuestions.filter((q) => q.skill === target)
+        : mode === "level"
+          ? questions.slice(0, 6)
+          : allQuestions);
   const [index, setIndex] = useState(0),
     [selected, setSelected] = useState(null),
     [revealed, setRevealed] = useState(false),

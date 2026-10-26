@@ -185,3 +185,38 @@ test("mobile English navigation and speaking recorder handle denied microphone",
     "Allow microphone access",
   );
 });
+test("live voice is a separate call interface without a text composer", async ({
+  page,
+}) => {
+  await page.goto("/#teacher");
+  await page.getByRole("button", { name: "صوت مباشر", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "ابدأ المحادثة الصوتية" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("textbox", { name: "رسالتك للمعلم" }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "ابدأ المحادثة الصوتية" }).click();
+  await expect(page.getByRole("alert")).toContainText("يلزم تفعيل");
+  await page.getByRole("button", { name: "رسائل", exact: true }).click();
+  await expect(
+    page.getByRole("textbox", { name: "رسالتك للمعلم" }),
+  ).toBeVisible();
+});
+test("generated bank opens a filtered hard practice session", async ({
+  page,
+}) => {
+  await page.goto("/#bank");
+  await expect(
+    page.getByRole("heading", { name: "بنك تدريب القواعد" }),
+  ).toBeVisible();
+  await page.getByLabel("الصعوبة", { exact: true }).selectOption("hard");
+  await page
+    .getByLabel("الموضوع", { exact: true })
+    .selectOption("past-perfect");
+  await page.getByRole("button", { name: "ابدأ جلسة من ١٠ أسئلة" }).click();
+  await expect(
+    page.getByRole("heading", { name: /Use past perfect/ }),
+  ).toBeVisible();
+  await expect(page.getByText("السؤال 1 من 10")).toBeVisible();
+});

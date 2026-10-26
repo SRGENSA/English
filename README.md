@@ -28,7 +28,9 @@ Create `.env` from `.env.example` for local use, or supply **LEARNING_AI_KEY** s
 
 `GET /api/health` reports service readiness and whether a key is present (not whether provider authorization succeeds). Without it, the UI explicitly reports that the tutor is disabled and offers a **fixed educational example**. With it, signed-in learners can POST bounded history to `/api/chat`; the provider receives a tutoring policy and user messages. A per-IP limit is present. Live provider behavior cannot be validated until a usable key and destination access exist. Provider outages and malformed requests return explicit errors.
 
-Voice mode uses browser SpeechRecognition and SpeechSynthesis. Learners review dictated text before sending; replies can be spoken. This is **not** realtime duplex AI audio. Microphone access requires a secure browser context and permission. Browser support, voice quality and recognition service availability vary. Some browsers send audio to their speech service; the UI discloses this. Text remains available if speech is unsupported.
+Voice mode now uses a **direct WebRTC Realtime audio session**. The browser obtains microphone permission, exchanges SDP through authenticated `/api/realtime`, and receives the tutor's audio track. Text chat is a separate mode with its own composer. The server keeps the provider key private, limits session starts and sends the level/topic teaching policy. Configure `LEARNING_AI_KEY` with Realtime access and billing; optional `LEARNING_REALTIME_MODEL` defaults to `gpt-realtime`. The same api.openai.com destination is used. Sessions have an in-app ten-minute timeout and close microphone tracks on hangup or navigation. Live provider negotiation/audio remains unverified without credentials. A mocked SDP exchange does not prove a live call works.
+
+Pronunciation examples and the separate self-recording workshop still use browser playback/local recording. Those recordings are not sent to the voice API. During a live Realtime call, microphone audio is sent to the provider as disclosed beside the start control.
 
 ## Accounts and persistence
 
@@ -76,6 +78,12 @@ The interface and explanations support Arabic/English with persistent language a
 
 `src/courses.js` holds 12 original bilingual modules: present simple, present continuous, past simple, present perfect, future forms, articles, prepositions, countability, comparisons, passive, conditionals and speaking practice. Each has a rule, examples, a corrected mistake and two explained questions. Lesson completion marks are browser-local; quiz results use existing account sync.
 
-Six original silent MP4 lessons and posters ship under `public/lessons/`. These are text-based visual lessons, not narrated teacher recordings. Reproduce with `node scripts/generate-lesson-videos.mjs` after installing dependencies; this authoring step also needs system Chromium and ffmpeg. Generated MP4 files are committed, so Render does not need those tools. The server serves byte ranges for seeking.
+Twelve original silent MP4 lessons and posters ship under `public/lessons/`. These are text-based visual lessons, not narrated teacher recordings. Reproduce with `node scripts/generate-lesson-videos.mjs` after installing dependencies; this authoring step also needs system Chromium and ffmpeg. Generated MP4 files are committed, so Render does not need those tools. The server serves byte ranges for seeking.
 
 Speaking practice uses local MediaRecorder recording/playback and browser speech examples. Recordings are not uploaded or automatically graded. It requires browser microphone permission and HTTPS. Tutor settings include CEFR level and session focus; the server adapts its teaching policy and prioritizes useful corrections, examples and a follow-up question. Real model quality remains unvalidated without a service key.
+
+## Supplemental generated bank
+
+`src/questionBank.js` defines **100,000 distinct compositional grammar drill prompts**, not 100,000 independently authored or pedagogically reviewed exam questions. The catalog combines 100 verb phrases, 16 subjects, 8 grammar families and time contexts, with easy/medium/hard pattern labels. Difficulty is not officially calibrated. Drills are generated on demand; the UI samples ten matching the selected filters and records the result. The existing 36 authored mixed/lesson questions remain separate.
+
+`node scripts/export-question-bank.mjs /tmp/talaqa-generated-bank.ndjson` materializes the complete catalog. The committed gzip NDJSON download is `public/generated-bank.ndjson.gz`. Tests verify all 100,000 stems are distinct and have four distinct options, but this is a structural audit, not an independent semantic review. Twelve foundation lessons with twelve short silent visual clips do not constitute a complete English/STEP curriculum. That larger editorial curriculum and an independently reviewed varied 100k exam bank remain outstanding.

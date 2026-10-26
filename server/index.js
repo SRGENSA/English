@@ -1,4 +1,5 @@
 import http from "node:http";
+import { connectRealtime } from "./realtime.js";
 import { createReadStream } from "node:fs";
 import { createStore, validProgress } from "./store.js";
 import { readFile, stat } from "node:fs/promises";
@@ -71,6 +72,43 @@ export function createServer(options = {}) {
             return reply(res, 403, { error: "مصدر الطلب غير صالح." });
           }
         }
+      }
+      if (req.url === "/api/realtime" && req.method === "POST") {
+        if (!store.user(token))
+          return reply(res, 401, {
+            error: "سجّل الدخول لاستخدام المعلم الذكي.",
+          });
+        if (!process.env.LEARNING_AI_KEY)
+          return reply(res, 503, {
+            error:
+              "Voice AI is not configured. Set LEARNING_AI_KEY with Realtime access.",
+          });
+        const key = "voice:" + req.socket.remoteAddress;
+        const now = Date.now();
+        let rate = limits.get(key);
+        if (!rate || now - rate.start > 60000) {
+          rate = { start: now, count: 0 };
+          limits.set(key, rate);
+        }
+        if (++rate.count > 5)
+          return reply(res, 429, {
+            error: "Wait one minute before starting another call.",
+          });
+        let body;
+        try {
+          body = await readBody(req);
+        } catch {
+          return reply(res, 400, { error: "Invalid voice request." });
+        }
+        const result = await connectRealtime(
+          body || {},
+          process.env.LEARNING_AI_KEY,
+        );
+        return reply(
+          res,
+          result.status,
+          result.error ? { error: result.error } : { sdp: result.sdp },
+        );
       }
       if (req.url === "/api/auth/me")
         return reply(res, 200, { user: store.user(token) });

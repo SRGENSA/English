@@ -16,9 +16,9 @@ test("every original bilingual lesson has examples, corrected mistakes and two v
     }
   }
 });
-test("six original video lessons and posters are present", () => {
+test("all twelve original video lessons and posters are present", () => {
   const videos = courses.filter((c) => c.video);
-  assert.equal(videos.length, 6);
+  assert.equal(videos.length, 12);
   for (const c of videos) {
     assert.ok(statSync(`public/lessons/${c.id}.mp4`).size > 1000);
     assert.ok(statSync(`public/lessons/${c.id}-poster.png`).size > 1000);

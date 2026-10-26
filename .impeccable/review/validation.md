@@ -1,0 +1,11 @@
+# Validation record — 2026-10-26
+
+- Re-ran the exact saved installation script: Node version check, frozen `npm ci`, production build and API tests all passed.
+- API suite: 8 passed, 0 failed, 0 skipped. Provider success was mocked; no live AI response was verified.
+- Browser suite after final changes: 5 passed, 0 failed, 0 skipped, using installed `/usr/bin/chromium`. Covers preferences and vocabulary persistence; explained grammar and saved result; missing AI/static demo truth; mobile navigation; account signup, logout/login and progress sync.
+- Production server on temporary port 3002: HTML and all entry JS/CSS assets returned 200, health returned status ok and aiConfigured false; compiled UI opened an interactive grammar exercise without JS errors. Temporary production server then stopped; development server remains running.
+- Desktop 1440px and mobile 390px captures: 12 initial final-state captures had no page overflow or JS errors. Additional captures show actual completed 4/4 grammar and its saved result. Mobile voice disclosure was recaptured after correction.
+- Independent design review: all five original material findings resolved, plus explicit mobile browser-speech/privacy explanation. Final verdict: ship as MVP at that review scope. No design detector ran because the impeccable launcher is not present in this environment. Token-bearing DESIGN.md and design sidecar documented.
+- Disposable account records removed; zero retained accounts at completion. No prior repository files existed; all application, lockfile and documentation additions are intentional. Runtime node_modules, dist, data and test-results remain ignored.
+- Saved configuration draft: install_script, start_skill and LEARNING_AI_KEY requirement for api.openai.com. Saving also added api.openai.com to draft destinations. Current runtime still has no AI secret; draft saving did not activate the key, publish the environment or deploy the application.
+- Live AI text tutoring remains blocked on secure key entry and applying destination access. Browser microphone/recognition and sound were not validated on a real learner device. Browser speech is not realtime AI audio. Payment, password recovery, email verification, large reviewed question bank and public commercial deployment remain outstanding. No official STEP or revenue claims are made.

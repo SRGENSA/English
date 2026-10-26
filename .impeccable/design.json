@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T12:16:28.074413+00:00",
+  "title": "Design System: طلاقة / TALAQA",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "dialog",
+        "value": "0 20px 80px #0f30253d",
+        "purpose": "Modal depth."
+      },
+      {
+        "name": "toast",
+        "value": "0 8px 30px #122f3326",
+        "purpose": "Transient notification."
+      },
+      {
+        "name": "selected-filter",
+        "value": "0 2px 6px #2343290a",
+        "purpose": "Selected segmented filter."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Shared easing."
+      },
+      {
+        "name": "wave",
+        "value": "2.8s var(--ease) infinite alternate",
+        "purpose": "Ornamental pronunciation bars; disabled with reduced motion."
+      },
+      {
+        "name": "button-transition",
+        "value": "background 0.2s, color 0.2s, transform 0.2s",
+        "purpose": "Button state changes; disabled with reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1500px"
+      },
+      {
+        "name": "desktop-compact",
+        "value": "1200px"
+      },
+      {
+        "name": "content-stack",
+        "value": "1100px"
+      },
+      {
+        "name": "tablet",
+        "value": "1000px"
+      },
+      {
+        "name": "drawer",
+        "value": "760px"
+      },
+      {
+        "name": "phone",
+        "value": "540px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "html": "<button class=\"ds-button-primary\" dir=\"rtl\">ابدأ التدريب</button>",
+      "css": ".ds-button-primary{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;background:var(--green, #174d40);color:#fff;border:none;border-radius:7px;min-height:42px;padding:9px 17px;font-weight:650;cursor:pointer;transition:background .2s,transform .2s}.ds-button-primary:hover{background:#23634f}.ds-button-primary:focus-visible{outline:3px solid #d38953;outline-offset:4px}.ds-button-primary:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}}",
+      "description": "Shared action treatment from the implemented controls."
+    },
+    {
+      "name": "Light button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "html": "<button class=\"ds-button-light\" dir=\"rtl\">ابدأ التدريب</button>",
+      "css": ".ds-button-light{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;background:#e7eecf;color:#204733;border:none;border-radius:7px;min-height:42px;padding:9px 17px;font-weight:650;cursor:pointer;transition:background .2s,transform .2s}.ds-button-light:hover{background:#f4f6d7}.ds-button-light:focus-visible{outline:3px solid #d38953;outline-offset:4px}.ds-button-light:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-button-light{transition:none}}",
+      "description": "Shared action treatment from the implemented controls."
+    },
+    {
+      "name": "Outline button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "html": "<button class=\"ds-button-outline\" dir=\"rtl\">ابدأ التدريب</button>",
+      "css": ".ds-button-outline{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;background:transparent;color:var(--ink, #253c34);border:1px solid #dce2d6;border-radius:7px;min-height:42px;padding:9px 17px;font-weight:650;cursor:pointer;transition:background .2s,transform .2s}.ds-button-outline:hover{background:#edf1e7}.ds-button-outline:focus-visible{outline:3px solid #d38953;outline-offset:4px}.ds-button-outline:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-button-outline{transition:none}}",
+      "description": "Shared action treatment from the implemented controls."
+    },
+    {
+      "name": "Labeled field",
+      "kind": "input",
+      "refersTo": "field",
+      "html": "<label class=\"ds-label\" dir=\"rtl\">بماذا نناديك؟<input class=\"ds-field\" placeholder=\"اسمك\"></label>",
+      "css": ".ds-label{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;display:block;color:#253c34}.ds-field{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;display:block;margin-top:10px;padding:10px 12px;background:#fff;color:#4e6c3f;border:1px solid #d7e0cd;border-radius:8px;font-size:14px}.ds-field:hover{border-color:#174d40}.ds-field:focus-visible{outline:3px solid #d38953;outline-offset:4px}",
+      "description": "Visible label and comfortable Arabic input."
+    },
+    {
+      "name": "Active navigation",
+      "kind": "nav",
+      "html": "<nav dir=\"rtl\"><button class=\"ds-nav\" aria-current=\"page\">خطة اليوم <span aria-hidden=\"true\">•</span></button></nav>",
+      "css": ".ds-nav{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;display:flex;justify-content:space-between;gap:12px;padding:14px 15px;background:#eaf1e6;color:#194d3b;border:0;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;min-width:190px}.ds-nav:hover{background:#f4f6f0}.ds-nav:focus-visible{outline:3px solid #d38953;outline-offset:4px}",
+      "description": "Current section in the right navigation rail."
+    },
+    {
+      "name": "Learning card",
+      "kind": "card",
+      "refersTo": "daily-list",
+      "html": "<section class=\"ds-card\" dir=\"rtl\"><button class=\"ds-lesson\">تدريب القواعد<span>ابدأ التدريب</span></button></section>",
+      "css": ".ds-card{background:#fff;border:1px solid var(--line, #e4e8df);border-radius:12px;padding:0 18px}.ds-lesson{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;display:flex;gap:20px;justify-content:space-between;width:100%;padding:18px 0;text-align:right;border:0;background:transparent;color:var(--ink, #253c34);cursor:pointer}.ds-lesson span{color:#65725e}.ds-lesson:hover{color:#174d40}.ds-lesson:focus-visible{outline:3px solid #d38953;outline-offset:4px}",
+      "description": "Flat bordered container with an actionable lesson row."
+    },
+    {
+      "name": "Segmented filter",
+      "kind": "chip",
+      "html": "<div class=\"ds-segments\" dir=\"rtl\"><button class=\"ds-selected\" aria-pressed=\"true\">كل الكلمات</button><button aria-pressed=\"false\">أتقنتها</button></div>",
+      "css": ".ds-segments{display:inline-flex;gap:4px;padding:4px;background:#eff2e9;border-radius:8px}.ds-segments button{font-family:\"Noto Sans Arabic Variable\",sans-serif;font-size:13px;border:0;padding:7px 13px;background:transparent;border-radius:5px;color:#67785b;cursor:pointer}.ds-segments .ds-selected{background:#fff;box-shadow:0 2px 6px #2343290a}.ds-segments button:hover{color:#174d40}.ds-segments button:focus-visible{outline:3px solid #d38953;outline-offset:4px}",
+      "description": "Word-library selection on a quiet tonal track."
+    }
+  ],
+  "narrative": {
+    "northStar": "A quiet learning desk",
+    "overview": "A welcoming, calm workspace makes daily practice feel manageable. Forest green anchors the interface; ivory, white and mint give Arabic text room to breathe. Peach and lavender markers help learners scan activities. The visual system supports practice, explanations and actual progress, with honest service states. Visual review approved shipping as an MVP within the original material-fix scope: legibility, mobile statistics, AI availability, touch areas, and remaining surface/completion evidence are resolved, along with the mobile browser voice/privacy disclosure. Live AI provider readiness and production launch remain unvalidated.",
+    "keyCharacteristics": [
+      "Arabic first with deliberate English regions",
+      "Tonal surfaces and fine borders",
+      "Clear daily actions and readable explanations",
+      "Honest learner data and capability states"
+    ],
+    "rules": [],
+    "dos": [
+      "Do preserve RTL and explicit English LTR regions.",
+      "Do use final readable-copy overrides and wrapping mobile statistics.",
+      "Do retain focus visibility and reduced motion."
+    ],
+    "donts": [
+      "Don't imply browser speech is a live AI session.",
+      "Don't canonize tiny residual metadata as instructional text.",
+      "Don't fabricate progress or commercial claims."
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: talaqa-english
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: TALAQA_DB_PATH
+        value: /tmp/talaqa.sqlite
+      - key: TALAQA_EPHEMERAL_STORAGE
+        value: "true"

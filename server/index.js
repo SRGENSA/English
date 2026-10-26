@@ -1,4 +1,5 @@
 import http from "node:http";
+import {narration} from "./narration.js";
 import { connectRealtime } from "./realtime.js";
 import { createReadStream } from "node:fs";
 import { createStore, validProgress } from "./store.js";
@@ -109,6 +110,11 @@ export function createServer(options = {}) {
           result.status,
           result.error ? { error: result.error } : { sdp: result.sdp },
         );
+      }
+      if(req.url==="/api/narration"&&req.method==="POST"){
+        if(!store.user(token))return reply(res,401,{error:"Sign in to use natural narration."});
+        const key="narration:"+req.socket.remoteAddress;const now=Date.now();let rate=limits.get(key);if(!rate||now-rate.start>60000){rate={start:now,count:0};limits.set(key,rate);}if(++rate.count>3)return reply(res,429,{error:"Please wait one minute before generating more narration."});
+        let body;try{body=await readBody(req);}catch{return reply(res,400,{error:"Invalid narration request."});}const result=await narration(body?.text);if(result.error)return reply(res,result.status,{error:result.error});res.writeHead(200,{"Content-Type":"audio/mpeg","Cache-Control":"no-store"});return res.end(result.audio);
       }
       if (req.url === "/api/auth/me")
         return reply(res, 200, { user: store.user(token) });

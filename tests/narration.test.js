@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {narration} from '../server/narration.js';
+test('natural narration reports missing credentials instead of substituting browser speech',async()=>{const key=process.env.LEARNING_VOICE_KEY;delete process.env.LEARNING_VOICE_KEY;try{assert.equal((await narration('A lesson')).status,503);}finally{if(key)process.env.LEARNING_VOICE_KEY=key;}});

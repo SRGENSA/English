@@ -1,3 +1,4 @@
+import NaturalNarration from "./NaturalNarration";
 import React, { useState, useEffect, useRef } from "react";
 import {
   BookOpen,
@@ -97,6 +98,7 @@ export function Learning({ startQuiz, goTeacher }) {
             <h2>{lesson.title[lang]}</h2>
           </div>
           <p className="course-intro">{lesson.explanation[lang]}</p>
+          <NaturalNarration key={lesson.id+lang} lesson={lesson}/>
           <div className="grammar-formula" dir="ltr">
             {lesson.rule}
           </div>
